@@ -132,11 +132,7 @@ export const createImagePost = async (req, res, next) => {
 }
 
 export const deletePost = async (req, res, next) => {
-    try{
-
-    } catch (error) {
-        next(error)
-    }
+    
 }
 
 export const likePost = async (req, res, next) => {}
