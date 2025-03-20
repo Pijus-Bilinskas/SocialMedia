@@ -132,9 +132,47 @@ export const createImagePost = async (req, res, next) => {
 }
 
 export const deletePost = async (req, res, next) => {
-    
+        try{
+            const post = await Post.findById(req.params.id);
+
+            if(!post){
+             return res.status(404).json({ message: "Post not found" })
+            }    
+
+            if(post.userId.toString() !== req.user._id.toString()){
+                return res.stauts(403).json({ message: "You can't delete this post" })
+            }
+            
+            await post.delete()
+            
+            res.status(200).json({ message: "Post deleted successfully"})
+    } catch (error) {
+        next(error)
+    }
 }
 
-export const likePost = async (req, res, next) => {}
+export const likePost = async (req, res, next) => {
+    try{
+        const user = await User.findById(req.user._id)
+        if(!user){
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        const postId = req.params.id
+
+        if(user.likedContent.includes(postId)){
+            user.likedContent.pull(postId);
+            await user.save();
+            return res.status(200).json({ message: "Content successfully unliked" })
+        }
+        
+        user.likedContent.push(postId);
+        await user.save();
+
+        return res.status(200).json({ message: "Content successfully liked" })
+    } catch(error) {
+        next(error)
+    }
+}
 
 export const post = async (req, res, next) => {}

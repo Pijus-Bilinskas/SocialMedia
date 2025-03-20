@@ -27,9 +27,17 @@ const userSchema = new mongoose.Schema({
         required: [true, "User password is required"],
         minLength: 6,
     },
-    followers: {
+    profilePic: {
+        type: String,
+    },
+    followed: {
         type: Array,
+    },
+    likedContent: {
+        type: Array,
+
     }
+
 }, {timestamps: true});
 //timestamps will auto add createdAt and updated fields to the Schema
 
