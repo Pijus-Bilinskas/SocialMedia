@@ -2,8 +2,9 @@ import mongoose from "mongoose"
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET, JWT_EXPIRES_IN } from "../config/env.js";
+import { JWT_SECRET, JWT_EXPIRES_IN, FRONTEND_URL } from "../config/env.js";
 import {v4 as uuidv4} from "uuid";
+import sendEmail from "../config/nodemailer.js";
 
 
 export const signUp = async (req, res, next) => {
@@ -82,5 +83,66 @@ export const signIn = async (req, res, next) => {
 }
 
 export const signOut = async (req, res, next) => {
-    //signs out logic
+    //frontend could remove the jwt from cookies as a signout
+}
+
+export const requestPasswordReset = async (req, res, next) => {
+    try{
+        const { email } = req.body;
+        const user = await User.findOne({ email })
+
+        if(!user) {
+            return res.status(404).json({ succcess: false, message: "User not found" })
+        }
+
+        const resetToken = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: "15m" })
+
+        const resetLink = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
+        
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; text-align: center;">
+                <h2>🔒 Reset Your Password</h2>
+                <p>Click the button below to reset your password:</p>
+                <a href="${resetLink}" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Reset Password</a>
+                <p>This link will expire in 15 minutes.</p>
+            </div>
+        `;
+
+        await sendEmail(user.email, "Password Reset Request", emailHtml);
+    
+        res.status(200).json({ success: true, message: "Password reset email sent" });
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const resetPassword = async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try{
+        const {token, newPassword} = req.body;
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(decoded.userId).session(session)
+
+        if(!user){
+            return res.status(400).json({ success: false, message: "Invalid or expired token" })
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt)
+
+        await user.save({ session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.status(200).json({ succcess: true, message: "Password reset successful" })
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        next(error)
+    }
 }

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const chatSchema = new mongoose.Schema({
     type: {
         type: String,
-        enum: [ "personal" | "group" ],
+        enum: [ "personal", "group" ],
         required: true
     },
     participants: [
@@ -16,9 +16,7 @@ const chatSchema = new mongoose.Schema({
     groupName: {
         type: String,
         minLength: 2,
-        required: function () {
-            return this.type === "group"
-        }
+        default: null
     },
     groupAdmin: {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +29,12 @@ const chatSchema = new mongoose.Schema({
         type: String,
         default: null
     },
+    messages: [
+    {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+        },
+    ],
 
 }, {timestamps: true})
 

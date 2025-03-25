@@ -13,20 +13,16 @@ const messageSchema = new mongoose.Schema({
    },
    messageType: {
     type: String,
-    enum: ["text" | "image" | "video" | "file"],
+    enum: ["text", "image",  "video",  "file"],
     required: [true, "message type is required"]
    },
    messageContent: {
     type: String,
-    required: function (){
-        return this.messageType === "text";
-    }
+    default: null
    },
    mediaUrl: {
     type: String,
-    required: function () {
-        return ["image", "video", "file"].includes(this.messageType);
-    }
+    default: null
    },
    isEdited: {
     type: Boolean,

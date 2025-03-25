@@ -48,6 +48,14 @@ export const updateUserProfile = async (req, res, next) => {
     }
 }
 
+export const deleteUser = async (req, res, next) => {
+    try{
+        //
+
+    } catch (error) {
+        next(error)
+    }
+}
 
 export const changeUserPassword = async (req, res, next) => {
     try{
