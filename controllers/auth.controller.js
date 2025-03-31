@@ -124,7 +124,6 @@ export const resetPassword = async (req, res, next) => {
         const {token, newPassword} = req.body;
 
         const decoded = jwt.verify(token, JWT_SECRET);
-
         const user = await User.findById(decoded.userId).session(session)
 
         if(!user){

@@ -6,10 +6,10 @@ export const personalMessageCreate = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
-        const { recipientId, content } = req.body;
-        const senderId = req.user._id;
+        const { recipientId, messageContent } = req.body;
+        const senderId = req.user._id.toString();
 
-        if(!recipientId || !content){
+        if(!recipientId || !messageContent){
             
             return res.status(400).json({ message: "Recipient and content are required" });
         }
@@ -29,8 +29,8 @@ export const personalMessageCreate = async (req, res, next) => {
         const message = new Message({
             chatId: chat._id,
             senderId: senderId,
-            contentType: "text",
-            contentContent: content
+            messageType: "text",
+            messageContent: messageContent
         });
 
         await message.save({ session })
@@ -53,7 +53,7 @@ export const personalMessageDelete = async (req, res, next) => {
         const session = await mongoose.startSession();
         session.startTransaction()
     try {
-        const message = await mongoose.Message.findOne({ chatId: req.params._id  ,senderId: req.user._id })
+        const message = await mongoose.Message.findOne({ chatId: req.params.id  ,senderId: req.user._id, id:  })
 
         if(!message){
             return res.status(404).json({ message: "Message was not found" })

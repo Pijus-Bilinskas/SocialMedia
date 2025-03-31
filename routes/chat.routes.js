@@ -1,4 +1,4 @@
-import { authorize } from "../middlewares/auth.middleware.js";
+import authorize  from "../middlewares/auth.middleware.js";
 import { Router } from "express";
 import { personalMessageCreate, personalMessageDelete } from "../controllers/chat.controller.js";
 
