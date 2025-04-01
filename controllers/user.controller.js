@@ -50,17 +50,9 @@ export const updateUserProfile = async (req, res, next) => {
 
 export const deleteUser = async (req, res, next) => {
     try{
-        //
+        // add logic for deleting user, perhaps admin only
 
     } catch (error) {
-        next(error)
-    }
-}
-
-export const changeUserPassword = async (req, res, next) => {
-    try{
-        //logic for verifying and changing password
-    }catch (error) {
         next(error)
     }
 }

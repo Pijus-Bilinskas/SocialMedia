@@ -7,11 +7,13 @@ import connectToDatabase from "./database/mongodb.js";
 import postRouter from "./routes/post.routes.js";
 import userRouter from "./routes/user.routes.js";
 import chatRouter from "./routes/chat.routes.js";
+import arcjetMiddleware from "./middlewares/arcjet.middleware.js";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
+app.use(arcjetMiddleware);
 
 
 app.use('/api/v1/auth', authRouter)

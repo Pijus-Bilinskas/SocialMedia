@@ -175,4 +175,3 @@ export const likePost = async (req, res, next) => {
     }
 }
 
-export const post = async (req, res, next) => {}

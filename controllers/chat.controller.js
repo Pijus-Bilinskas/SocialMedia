@@ -53,10 +53,16 @@ export const personalMessageDelete = async (req, res, next) => {
         const session = await mongoose.startSession();
         session.startTransaction()
     try {
-        const message = await mongoose.Message.findOne({ chatId: req.params.id  ,senderId: req.user._id, id:  })
+        // const message = await mongoose.Message.findOne({ chatId: req.params.id  ,senderId: req.user._id, id:  })
+        
+        const message = await mongoose.Message.findById(req.body.messageId)
 
         if(!message){
             return res.status(404).json({ message: "Message was not found" })
+        }
+
+        if(message.senderId !== req.user._id){
+            return res.status(401).json({ message: "Message senderId does not match with users" })
         }
 
         const chat = await mongoose.Chat.findById(message.chatId)
@@ -78,5 +84,23 @@ export const personalMessageDelete = async (req, res, next) => {
         await session.abortTransaction();
         session.endSession();
         next(error);
+    }
+}
+
+export const personalMessages = async (req, res, next) => {
+    try{
+        const chat = await mongoose.Chat.findOne({ participants: {$all: [req.user._id, req.body.otherUserId]} });
+        if(!chat){
+            return res.status(404).json({ message: "Chat was not found" })
+        }
+        if(!chat.participants.includes(req.user._id)){
+            return res.status(403).json({ message: "User not found within participants" })
+        }
+        
+        const messages = await mongoose.Message.find({ chatId: chat._id})
+
+        return res.status(200).json({ success: true, data: messages })
+    } catch (error) {
+        next(error)
     }
 }
